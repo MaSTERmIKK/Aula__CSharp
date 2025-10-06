@@ -1,0 +1,155 @@
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+
+namespace GelateriaDolceGelo
+{
+    class Program
+    {
+        // Cultura italiana per la formattazione in Euro
+        private static readonly CultureInfo itIT = new CultureInfo("it-IT");
+
+        static void Main(string[] args)
+        {
+            // 1) Array dei gusti e dei prezzi (array paralleli)
+            string[] gusti = { "Cioccolato", "Vaniglia", "Fragola", "Pistacchio", "Limone" };
+            double[] prezzi = { 1.50, 1.20, 1.30, 1.80, 1.10 };
+
+            // Parametri di sconto
+            const double sogliaSconto = 10.0;     // Soglia oltre la quale scatta lo sconto
+            const double percentualeSconto = 0.10; // 10%
+
+            // Liste per memorizzare l'ordine (indici gusto e quantità)
+            List<int> indiciGusto = new List<int>();
+            List<int> quantitaPerGusto = new List<int>();
+
+            Console.WriteLine("--- Benvenuto alla Gelateria DolceGelo! ---");
+
+            bool continua = true;
+            while (continua)
+            {
+                // 2) Stampa menu
+                StampaMenu(gusti, prezzi);
+
+                // 3) Lettura sicura dell'indice gusto (0..gusti.Length-1)
+                int indice = LeggiIntero("Inserisci il numero del gusto: ", 0, gusti.Length - 1);
+
+                // 4) Lettura sicura della quantità (min 1, max a piacere es. 20)
+                int quantita = LeggiIntero("Quante palline vuoi? ", 1, 20);
+
+                // Salva la scelta
+                indiciGusto.Add(indice);
+                quantitaPerGusto.Add(quantita);
+
+                // 5) Chiedi se aggiungere altro tramite condizione
+                Console.Write("Aggiungere un altro gusto? (s/n) ");
+                string risposta = Console.ReadLine()?.Trim().ToLower() ?? "n";
+                continua = (risposta == "s" || risposta == "si" || risposta == "sì");
+                Console.WriteLine();
+            }
+
+            // 6) Calcolo totale + eventuale sconto e stampa riepilogo
+            StampaRiepilogo(indiciGusto, quantitaPerGusto, gusti, prezzi, sogliaSconto, percentualeSconto);
+            
+            Console.WriteLine("Grazie e buona giornata!");
+        }
+
+        /// <summary>
+        /// Stampa il menu gusti con prezzi.
+        /// </summary>
+        static void StampaMenu(string[] gusti, double[] prezzi)
+        {
+            Console.WriteLine("Gusti disponibili:");
+            for (int i = 0; i < gusti.Length; i++)
+            {
+                Console.WriteLine($"{i} - {gusti[i]} ({prezzi[i].ToString("C2", itIT)})");
+            }
+            Console.WriteLine();
+        }
+
+        /// <summary>
+        /// Legge un intero compreso tra min e max (inclusi) con validazione.
+        /// </summary>
+        static int LeggiIntero(string prompt, int min, int max)
+        {
+            while (true)
+            {
+                Console.Write(prompt);
+                string? input = Console.ReadLine();
+
+                if (int.TryParse(input, out int valore))
+                {
+                    if (valore >= min && valore <= max)
+                        return valore;
+
+                    Console.WriteLine($"Valore fuori range. Inserisci un numero tra {min} e {max}.\n");
+                }
+                else
+                {
+                    Console.WriteLine("Input non valido. Inserisci un numero intero.\n");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Calcola il subtotale per una riga d'ordine (gusto + quantità).
+        /// </summary>
+        static double CalcolaSubtotale(int indiceGusto, int quantita, double[] prezzi)
+        {
+            return prezzi[indiceGusto] * quantita;
+        }
+
+        /// <summary>
+        /// Applica lo sconto se il totale supera la soglia.
+        /// Ritorna (totaleScontato, scontoApplicato).
+        /// </summary>
+        static (double totaleScontato, double sconto) ApplicaSconto(double totale, double soglia, double percentuale)
+        {
+            if (totale > soglia)
+            {
+                double sconto = totale * percentuale;
+                return (totale - sconto, sconto);
+            }
+            return (totale, 0.0);
+        }
+
+        /// <summary>
+        /// Stampa il riepilogo completo: righe d'ordine, totali, sconto.
+        /// </summary>
+        static void StampaRiepilogo(
+            List<int> indiciGusto,
+            List<int> quantitaPerGusto,
+            string[] gusti,
+            double[] prezzi,
+            double sogliaSconto,
+            double percentualeSconto)
+        {
+            Console.WriteLine("---- Riepilogo ordine ----");
+
+            double totaleParziale = 0.0;
+
+            for (int i = 0; i < indiciGusto.Count; i++)
+            {
+                int idx = indiciGusto[i];
+                int qta = quantitaPerGusto[i];
+                double sub = CalcolaSubtotale(idx, qta, prezzi);
+                totaleParziale += sub;
+
+                Console.WriteLine($"- {gusti[idx]} x{qta} = {sub.ToString("C2", itIT)}");
+            }
+
+            Console.WriteLine($"Totale parziale: {totaleParziale.ToString("C2", itIT)}");
+
+            // Verifica ed eventuale applicazione dello sconto
+            (double totaleFinale, double sconto) = ApplicaSconto(totaleParziale, sogliaSconto, percentualeSconto);
+
+            if (sconto > 0)
+            {
+                Console.WriteLine($"Hai diritto a uno sconto del {(percentualeSconto * 100):0}%: -{sconto.ToString("C2", itIT)}");
+            }
+
+            Console.WriteLine($"Totale da pagare: {totaleFinale.ToString("C2", itIT)}");
+            Console.WriteLine("--------------------------\n");
+        }
+    }
+}
