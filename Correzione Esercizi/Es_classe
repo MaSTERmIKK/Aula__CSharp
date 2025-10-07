@@ -1,0 +1,65 @@
+using System;
+
+public class Libro
+{
+    // Proprietà pubbliche auto-implementate
+    public string Titolo { get; set; }
+    public string Autore { get; set; }
+    public int AnnoPubblicazione { get; set; }
+
+    // Costruttore
+    public Libro(string titolo, string autore, int anno)
+    {
+        Titolo = titolo;
+        Autore = autore;
+        AnnoPubblicazione = anno;
+    }
+
+    // 1) ToString(): "Titolo di Autore (Anno)"
+    public override string ToString()
+    {
+        return $"{Titolo} di {Autore} ({AnnoPubblicazione})";
+    }
+
+    // 2) Equals(): due libri sono uguali se hanno stesso titolo e autore
+    public override bool Equals(object? obj)
+    {
+        if (obj is not Libro other) return false;
+        return Titolo == other.Titolo && Autore == other.Autore;
+    }
+
+    // 3) GetHashCode coerente con Equals (usa solo i campi usati in Equals)
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Titolo, Autore);
+    }
+}
+
+public class Program
+{
+    public static void Main()
+    {
+        // 4) Creiamo due oggetti con stessi valori
+        var libro1 = new Libro("Il nome della rosa", "Umberto Eco", 1980);
+        var libro2 = new Libro("Il nome della rosa", "Umberto Eco", 2014); // anno diverso apposta
+
+        // a) ToString()
+        Console.WriteLine("ToString():");
+        Console.WriteLine(libro1.ToString()); // "Il nome della rosa di Umberto Eco (1980)"
+        Console.WriteLine();
+
+        // b) Equals()
+        Console.WriteLine("Equals():");
+        Console.WriteLine($"libro1 == libro2? {libro1.Equals(libro2)}"); // atteso: True
+        Console.WriteLine();
+
+        // c) GetHashCode()
+        Console.WriteLine("GetHashCode():");
+        Console.WriteLine($"hash1 = {libro1.GetHashCode()}");
+        Console.WriteLine($"hash2 = {libro2.GetHashCode()}");
+        Console.WriteLine($"Uguali? {libro1.GetHashCode() == libro2.GetHashCode()}"); // atteso: True
+
+        // Pausa per vedere l’output se si esegue fuori da terminale
+        // Console.ReadKey();
+    }
+}
