@@ -1,0 +1,105 @@
+using System;
+using System.Collections.Generic;
+
+// Classe base che mostra INCAPSULAMENTO
+class Animale
+{
+    // Proprietà privata e incapsulata
+    private string nome;
+
+    // Costruttore
+    public Animale(string nome)
+    {
+        this.nome = nome;
+    }
+
+    // Metodo per accedere in modo controllato (incapsulamento)
+    public string GetNome()
+    {
+        return nome;
+    }
+
+    // Metodo virtuale per mostrare POLIMORFISMO
+    public virtual void Verso()
+    {
+        Console.WriteLine($"{nome} emette un verso generico.");
+    }
+}
+
+// Classe derivata 1 – mostra EREDITARIETÀ e POLIMORFISMO
+class Cane : Animale
+{
+    public Cane(string nome) : base(nome) { }
+
+    public override void Verso()
+    {
+        Console.WriteLine($"{GetNome()} abbaia: Bau Bau!");
+    }
+}
+
+// Classe derivata 2 – mostra EREDITARIETÀ e POLIMORFISMO
+class Gatto : Animale
+{
+    public Gatto(string nome) : base(nome) { }
+
+    public override void Verso()
+    {
+        Console.WriteLine($"{GetNome()} miagola: Miao!");
+    }
+}
+
+// Programma principale con MENU e COLLEZIONE
+class Program
+{
+    static void Main()
+    {
+        List<Animale> animali = new List<Animale>();
+        bool continua = true;
+
+        while (continua)
+        {
+            Console.WriteLine("\n--- MENU ---");
+            Console.WriteLine("1. Inserisci un animale");
+            Console.WriteLine("2. Mostra tutti gli animali");
+            Console.WriteLine("3. Fai emettere il verso a tutti");
+            Console.WriteLine("4. Esci");
+            Console.Write("Scelta: ");
+            string scelta = Console.ReadLine();
+
+            switch (scelta)
+            {
+                case "1":
+                    Console.Write("Inserisci tipo (cane/gatto): ");
+                    string tipo = Console.ReadLine().ToLower();
+                    Console.Write("Inserisci nome: ");
+                    string nome = Console.ReadLine();
+
+                    if (tipo == "cane") animali.Add(new Cane(nome));
+                    else if (tipo == "gatto") animali.Add(new Gatto(nome));
+                    else Console.WriteLine("Tipo non valido!");
+                    break;
+
+                case "2":
+                    Console.WriteLine("\nElenco animali:");
+                    foreach (Animale a in animali)
+                        Console.WriteLine($"- {a.GetNome()} ({a.GetType().Name})");
+                    break;
+
+                case "3":
+                    Console.WriteLine("\nVersi degli animali:");
+                    foreach (Animale a in animali)
+                        a.Verso();
+                    break;
+
+                case "4":
+                    continua = false;
+                    Console.WriteLine("Chiusura programma...");
+                    break;
+
+                default:
+                    Console.WriteLine("Scelta non valida.");
+                    break;
+            }
+        }
+    }
+}
