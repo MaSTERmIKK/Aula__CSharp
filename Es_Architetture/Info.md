@@ -1,0 +1,1 @@
+Esempi semplificati di architteture. 
