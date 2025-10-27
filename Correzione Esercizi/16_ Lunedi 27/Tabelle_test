@@ -1,0 +1,16 @@
+1. Libri (
+   id INT,
+   titolo VARCHAR(100),
+   autore VARCHAR(100),
+   genere VARCHAR(50),
+   anno_pubblicazione INT,
+   prezzo DECIMAL(6,2)
+)
+
+2. Vendite (
+   id INT,
+   id_libro INT,
+   data_vendita DATE,
+   quantita INT,
+   negozio VARCHAR(100)
+)
